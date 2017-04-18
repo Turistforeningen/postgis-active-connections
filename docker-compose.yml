@@ -6,6 +6,7 @@ services:
     volumes:
     - .:/app
     environment:
-      HOST: 'postgres'
-      DATABASE: 'postgres'
-      USER: 'postgres'
+      DB_HOST: 'postgres'
+      DB_DATABASE: 'postgres'
+      DB_USER: 'postgres'
+      STATSD_HOST: 'statsd'
