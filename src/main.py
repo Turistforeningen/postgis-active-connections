@@ -1,8 +1,13 @@
-import socket
+import json
 import os
 import psycopg2
+import socket
 import threading
 import time
+
+# Read secrets
+with open('/secrets/secrets.json') as f:
+    secrets = json.loads(f.read())
 
 
 def main():
@@ -16,7 +21,7 @@ def report_active_connections():
         os.environ['DB_HOST'],
         os.environ['DB_DATABASE'],
         os.environ['DB_USER'],
-        'password',  # TODO
+        secrets['DB_PASSWORD'],
     ))
     cursor = connection.cursor()
     cursor.execute("select state from pg_stat_activity;")
