@@ -1,0 +1,24 @@
+box: python:3
+build:
+  steps:
+    - script:
+      name: install dependencies
+      code: |
+        pip install -r requirements-dev.txt
+
+    - script:
+        name: flake8
+        code: |
+          flake8 src
+
+    - script:
+        name: docker hub build
+        code: |
+          curl --verbose \
+            -H "Content-Type: application/json" \
+            -d "{\"source_type\": \"Branch\", \"source_name\": \"$DOCKER_TRIGGER_BRANCH\"}" \
+            -X POST $DOCKER_TRIGGER_URL
+
+  after-steps:
+    - turistforeningen/slack-notifier:
+        url: $SLACK_WEBHOOK_URL

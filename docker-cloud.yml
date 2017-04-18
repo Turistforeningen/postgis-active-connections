@@ -1,0 +1,20 @@
+postgis-active-connections:
+  image: 'turistforeningen/postgis-active-connections'
+  tags:
+    - app
+  volumes_from:
+    - 'secrets:ro'
+  autoredeploy: true
+  restart: always
+  environment:
+    DB_HOST: 'postgres'
+    DB_DATABASE: 'postgres'
+    DB_USER: 'postgres'
+    STATSD_HOST: 'statsd'
+
+secrets:
+  image: 'turistforeningen/postgis-active-connections-secrets:v1'
+  tags:
+    - app
+  volumes:
+    - /secrets
