@@ -5,3 +5,7 @@ services:
     build: .
     volumes:
     - .:/app
+    environment:
+      HOST: 'postgres'
+      DATABASE: 'postgres'
+      USER: 'postgres'

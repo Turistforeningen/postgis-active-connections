@@ -1,3 +1,5 @@
+import os
+import psycopg2
 import threading
 import time
 
@@ -9,8 +11,22 @@ def main():
 
 
 def report_active_connections():
-    # TODO
-    pass
+    connection = psycopg2.connect("host=%s dbname=%s user=%s password=%s" % (
+        os.environ['HOST'],
+        os.environ['DATABASE'],
+        os.environ['USER'],
+        'password',  # TODO
+    ))
+    cursor = connection.cursor()
+    cursor.execute("select state from pg_stat_activity;")
+    states = {}
+    for row in cursor.fetchall():
+        if row[0] not in states:
+            states[row[0]] = 1
+        else:
+            states[row[0]] += 1
+
+    # TODO: Report to librato
 
 
 if __name__ == '__main__':
