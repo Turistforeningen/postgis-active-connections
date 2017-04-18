@@ -39,7 +39,7 @@ def report_active_connections():
     statsd_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     for key, value in states.items():
         name = 'postgres.active_connections.%s' % key.lower().replace(' ', '_')
-        message = ("%s:1|c" % (name)).encode('utf-8')
+        message = ("%s:%s|g" % (name, value)).encode('utf-8')
         statsd_socket.sendto(message, (os.environ["STATSD_HOST"], 8125))
 
     print("Reported %s connections to librato" % sum(states.values()))
