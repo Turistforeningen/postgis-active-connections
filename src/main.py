@@ -6,11 +6,13 @@ import threading
 import time
 
 # Read secrets
+print("Reading secrets...")
 with open('/secrets/secrets.json') as f:
     secrets = json.loads(f.read())
 
 
 def main():
+    print("Initiating main loop...")
     while True:
         threading.Thread(target=report_active_connections).start()
         time.sleep(30)  # Report every 30 seconds
@@ -39,6 +41,8 @@ def report_active_connections():
         name = 'postgres.active_connections.%s' % key.lower().replace(' ', '_')
         message = ("%s:1|c" % (name)).encode('utf-8')
         statsd_socket.sendto(message, (os.environ["STATSD_HOST"], 8125))
+
+    print("Reported %s connections to librato" % sum(states.values()))
 
 
 if __name__ == '__main__':
