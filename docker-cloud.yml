@@ -1,5 +1,8 @@
 postgis-active-connections:
   image: 'turistforeningen/postgis-active-connections'
+  links:
+    - 'statsd.statsd-librato:statsd'
+    - 'postgres.postgres:postgres'
   tags:
     - app
   volumes_from:
