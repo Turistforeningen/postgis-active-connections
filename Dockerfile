@@ -13,4 +13,4 @@ RUN apk update && \
 
 COPY . /app
 
-CMD ["python", "main.py"]
+CMD ["python", "src/main.py"]
