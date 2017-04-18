@@ -31,6 +31,8 @@ def report_active_connections():
             states[row[0]] = 1
         else:
             states[row[0]] += 1
+    cursor.close()
+    connection.close()
 
     statsd_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     for key, value in states.items():
