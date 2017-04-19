@@ -1,6 +1,7 @@
 import json
 import os
 import psycopg2
+import re
 import socket
 import threading
 import time
@@ -31,11 +32,16 @@ def report_active_connections():
         'active': 0,
         'idle': 0,
         'idle_in_transaction': 0,
-        'idle_in_transaction_(aborted)': 0,
+        'idle_in_transaction_aborted': 0,
         'fastpath_function_call': 0,
     }
     for row in cursor.fetchall():
-        key = row[0].lower().replace(' ', '_')
+        # Known states and librato metric name limitations:
+        # https://www.postgresql.org/docs/9.6/static/monitoring-stats.html
+        # https://www.librato.com/docs/kb/faq/best_practices/naming_convention_metrics_tags/
+        key = row[0]
+        key = re.sub(r'[()]', '', key)  # remove parentheses
+        key = re.sub(r' ', '_', key)  # replace space with underscore
         states[key] += 1
     cursor.close()
     connection.close()
