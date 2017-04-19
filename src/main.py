@@ -27,12 +27,16 @@ def report_active_connections():
     ))
     cursor = connection.cursor()
     cursor.execute("select state from pg_stat_activity;")
-    states = {}
+    states = {
+        'active': 0,
+        'idle': 0,
+        'idle_in_transaction': 0,
+        'idle_in_transaction_(aborted)': 0,
+        'fastpath_function_call': 0,
+    }
     for row in cursor.fetchall():
-        if row[0] not in states:
-            states[row[0]] = 1
-        else:
-            states[row[0]] += 1
+        key = row[0].lower().replace(' ', '_')
+        states[key] += 1
     cursor.close()
     connection.close()
 
