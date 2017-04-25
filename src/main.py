@@ -16,7 +16,7 @@ def main():
     print("Initiating main loop...")
     while True:
         threading.Thread(target=report_active_connections).start()
-        time.sleep(30)  # Report every 30 seconds
+        time.sleep(5)  # Report every this many seconds
 
 
 def report_active_connections():
