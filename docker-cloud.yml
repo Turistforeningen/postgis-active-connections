@@ -16,7 +16,7 @@ postgres-active-connections:
     STATSD_HOST: 'statsd'
 
 secrets:
-  image: 'turistforeningen/postgres-active-connections-secrets:v1'
+  image: 'turistforeningen/postgres-active-connections-secrets:v2'
   tags:
     - app
   volumes:
