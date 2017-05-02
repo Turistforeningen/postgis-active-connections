@@ -1,7 +1,7 @@
-from raven import Client
 import json
 import os
 import psycopg2
+from raven import Client
 import re
 import socket
 import threading
@@ -25,7 +25,8 @@ def main():
 
 def report_active_connections():
     try:
-        connection = psycopg2.connect("host=%s dbname=%s user=%s password=%s" % (
+        connection_url = "host=%s dbname=%s user=%s password=%s"
+        connection = psycopg2.connect(connection_url % (
             os.environ['DB_HOST'],
             os.environ['DB_DATABASE'],
             os.environ['DB_USER'],
@@ -53,7 +54,8 @@ def report_active_connections():
 
         statsd_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         for key, value in states.items():
-            name = 'postgres.active_connections.%s' % key.lower().replace(' ', '_')
+            name = 'postgres.active_connections.%s' % (
+                key.lower().replace(' ', '_'))
             message = ("%s:%s|g" % (name, value)).encode('utf-8')
             statsd_socket.sendto(message, (os.environ["STATSD_HOST"], 8125))
 
