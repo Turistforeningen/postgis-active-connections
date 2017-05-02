@@ -1,5 +1,5 @@
-postgis-active-connections:
-  image: 'turistforeningen/postgis-active-connections'
+postgres-active-connections:
+  image: 'turistforeningen/postgres-active-connections'
   links:
     - 'statsd.statsd-librato:statsd'
     - 'postgres.postgres:postgres'
@@ -16,7 +16,7 @@ postgis-active-connections:
     STATSD_HOST: 'statsd'
 
 secrets:
-  image: 'turistforeningen/postgis-active-connections-secrets:v1'
+  image: 'turistforeningen/postgres-active-connections-secrets:v1'
   tags:
     - app
   volumes:

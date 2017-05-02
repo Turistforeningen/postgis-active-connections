@@ -14,6 +14,6 @@ services:
       STATSD_HOST: 'statsd'
 
   secrets:
-    image: turistforeningen/postgis-active-connections-secrets:v1
+    image: turistforeningen/postgres-active-connections-secrets:v1
     volumes:
       - /secrets
