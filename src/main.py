@@ -2,6 +2,7 @@ import os
 import psycopg2
 import re
 import socket
+import sys
 import threading
 import time
 
@@ -66,8 +67,12 @@ def report_active_connections():
 
         logger.debug(
             "Reported %s connections to librato" % sum(states.values()))
-    except Exception:
+    except Exception as e:
         client.captureException()
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+        logger.error("%s:%s %s: %s" % (fname, exc_tb.tb_lineno, exc_type,
+                                       str(e).strip()))
 
 
 if __name__ == '__main__':
