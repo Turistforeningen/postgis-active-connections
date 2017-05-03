@@ -40,12 +40,19 @@ def report_active_connections():
             'idle_in_transaction': 0,
             'idle_in_transaction_aborted': 0,
             'fastpath_function_call': 0,
+            'null': 0,
         }
         for row in cursor.fetchall():
             # Known states and librato metric name limitations:
             # https://www.postgresql.org/docs/9.6/static/monitoring-stats.html
             # https://www.librato.com/docs/kb/faq/best_practices/naming_convention_metrics_tags/
             key = row[0]
+
+            # Handle null values. Not sure why this occurs, see:
+            # https://sentry.io/turistforeningen/postgres-active-connections/issues/264700288/
+            if key is None:
+                key = 'null'
+
             key = re.sub(r'[()]', '', key)  # remove parentheses
             key = re.sub(r' ', '_', key)  # replace space with underscore
             states[key] += 1
