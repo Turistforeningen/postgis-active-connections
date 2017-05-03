@@ -5,12 +5,13 @@ import socket
 import threading
 import time
 
+from log import logger
 from raven_client import client
 from secrets import secrets
 
 
 def main():
-    print("Initiating main loop...")
+    logger.info("Starting thread cannon loop. Here we go!")
     while True:
         threading.Thread(target=report_active_connections).start()
         time.sleep(5)  # Report every this many seconds
@@ -63,7 +64,8 @@ def report_active_connections():
             message = ("%s:%s|g" % (name, value)).encode('utf-8')
             statsd_socket.sendto(message, (os.environ["STATSD_HOST"], 8125))
 
-        print("Reported %s connections to librato" % sum(states.values()))
+        logger.debug(
+            "Reported %s connections to librato" % sum(states.values()))
     except Exception:
         client.captureException()
 

@@ -1,6 +1,7 @@
 from raven import Client
 
+from log import logger
 from secrets import secrets
 
-print("Initializing raven")
+logger.info("Initializing raven")
 client = Client(secrets['RAVEN_DSN'])
