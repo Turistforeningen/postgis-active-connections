@@ -1,19 +1,12 @@
-import json
 import os
 import psycopg2
-from raven import Client
 import re
 import socket
 import threading
 import time
 
-# Read secrets
-print("Reading secrets...")
-with open('/secrets/secrets.json') as f:
-    secrets = json.loads(f.read())
-
-# Initialize raven
-client = Client(secrets['RAVEN_DSN'])
+from raven_client import client
+from secrets import secrets
 
 
 def main():
