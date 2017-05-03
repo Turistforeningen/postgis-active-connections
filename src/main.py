@@ -20,43 +20,42 @@ def main():
 
 def report_active_connections():
     try:
-        connection_url = "host=%s dbname=%s user=%s password=%s"
-        connection = psycopg2.connect(connection_url % (
+        connection_url = "host=%s dbname=%s user=%s password=%s" % (
             os.environ['DB_HOST'],
             os.environ['DB_DATABASE'],
             os.environ['DB_USER'],
             secrets['DB_PASSWORD'],
-        ))
-        connection.set_session(autocommit=True)
-        with connection.cursor() as cursor:
-            cursor.execute("select state from pg_stat_activity;")
-            states = {
-                'active': 0,
-                'idle': 0,
-                'idle_in_transaction': 0,
-                'idle_in_transaction_aborted': 0,
-                'fastpath_function_call': 0,
-                'null': 0,
-            }
-            for row in cursor.fetchall():
-                # Known states and librato metric name limitations:
-                # https://www.postgresql.org/docs/9.6/static/monitoring-stats.html
-                # https://www.librato.com/docs/kb/faq/best_practices/naming_convention_metrics_tags/
-                key = row[0]
+        )
+        with psycopg2.connect(connection_url) as connection:
+            connection.set_session(autocommit=True)
+            with connection.cursor() as cursor:
+                cursor.execute("select state from pg_stat_activity;")
+                states = {
+                    'active': 0,
+                    'idle': 0,
+                    'idle_in_transaction': 0,
+                    'idle_in_transaction_aborted': 0,
+                    'fastpath_function_call': 0,
+                    'null': 0,
+                }
+                for row in cursor.fetchall():
+                    # Known states and librato metric name limitations:
+                    # https://www.postgresql.org/docs/9.6/static/monitoring-stats.html
+                    # https://www.librato.com/docs/kb/faq/best_practices/naming_convention_metrics_tags/
+                    key = row[0]
 
-                # Handle null values. Not sure why this occurs, see:
-                # https://sentry.io/turistforeningen/postgres-active-connections/issues/264700288/
-                if key is None:
-                    key = 'null'
+                    # Handle null values. Not sure why this occurs, see:
+                    # https://sentry.io/turistforeningen/postgres-active-connections/issues/264700288/
+                    if key is None:
+                        key = 'null'
 
-                # Remove parentheses
-                key = re.sub(r'[()]', '', key)
+                    # Remove parentheses
+                    key = re.sub(r'[()]', '', key)
 
-                # Replace space with underscore
-                key = re.sub(r' ', '_', key)
+                    # Replace space with underscore
+                    key = re.sub(r' ', '_', key)
 
-                states[key] += 1
-        connection.close()
+                    states[key] += 1
 
         statsd_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         for key, value in states.items():
