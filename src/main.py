@@ -32,6 +32,7 @@ def report_active_connections():
             os.environ['DB_USER'],
             secrets['DB_PASSWORD'],
         ))
+        connection.set_session(autocommit=True)
         cursor = connection.cursor()
         cursor.execute("select state from pg_stat_activity;")
         states = {
