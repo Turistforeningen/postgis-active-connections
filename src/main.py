@@ -33,31 +33,34 @@ def report_active_connections():
             secrets['DB_PASSWORD'],
         ))
         connection.set_session(autocommit=True)
-        cursor = connection.cursor()
-        cursor.execute("select state from pg_stat_activity;")
-        states = {
-            'active': 0,
-            'idle': 0,
-            'idle_in_transaction': 0,
-            'idle_in_transaction_aborted': 0,
-            'fastpath_function_call': 0,
-            'null': 0,
-        }
-        for row in cursor.fetchall():
-            # Known states and librato metric name limitations:
-            # https://www.postgresql.org/docs/9.6/static/monitoring-stats.html
-            # https://www.librato.com/docs/kb/faq/best_practices/naming_convention_metrics_tags/
-            key = row[0]
+        with connection.cursor() as cursor:
+            cursor.execute("select state from pg_stat_activity;")
+            states = {
+                'active': 0,
+                'idle': 0,
+                'idle_in_transaction': 0,
+                'idle_in_transaction_aborted': 0,
+                'fastpath_function_call': 0,
+                'null': 0,
+            }
+            for row in cursor.fetchall():
+                # Known states and librato metric name limitations:
+                # https://www.postgresql.org/docs/9.6/static/monitoring-stats.html
+                # https://www.librato.com/docs/kb/faq/best_practices/naming_convention_metrics_tags/
+                key = row[0]
 
-            # Handle null values. Not sure why this occurs, see:
-            # https://sentry.io/turistforeningen/postgres-active-connections/issues/264700288/
-            if key is None:
-                key = 'null'
+                # Handle null values. Not sure why this occurs, see:
+                # https://sentry.io/turistforeningen/postgres-active-connections/issues/264700288/
+                if key is None:
+                    key = 'null'
 
-            key = re.sub(r'[()]', '', key)  # remove parentheses
-            key = re.sub(r' ', '_', key)  # replace space with underscore
-            states[key] += 1
-        cursor.close()
+                # Remove parentheses
+                key = re.sub(r'[()]', '', key)
+
+                # Replace space with underscore
+                key = re.sub(r' ', '_', key)
+
+                states[key] += 1
         connection.close()
 
         statsd_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
